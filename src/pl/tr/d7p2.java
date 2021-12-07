@@ -3,8 +3,6 @@ package pl.tr;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 public class Main {
@@ -23,26 +21,19 @@ public class Main {
                 var minPos = positions.stream().mapToInt(c -> c).min().orElseThrow();
                 var maxPos = positions.stream().mapToInt(c -> c).max().orElseThrow();
 
-                var posToFuel = new HashMap<Integer, Integer>();
+                var fuelCosts = new ArrayList<Integer>();
 
                 for(var i = minPos; i <= maxPos; i++) {
-                    var finalI = i;
+                    final var p = i;
                     var val = positions.stream().reduce(0, (t, next) -> {
-                        var movesNeeded = Math.abs(next - finalI);
-                        var moveCost = 1;
-                        var sum = 0;
-                        for(var x = 0; x < movesNeeded; x++) {
-                            sum += moveCost++;
-                        }
-                        return t + sum;
+                        var dst = Math.abs(next - p);
+                        return t + dst * (dst + 1) / 2;
                     });
-                    posToFuel.put(i, val);
+                    fuelCosts.add(val);
                 }
 
-                var minFuel = posToFuel.entrySet().stream()
-                        .min(Comparator.comparingInt(Map.Entry::getValue))
-                        .orElseThrow().getValue();
-
+                var minFuel = fuelCosts.stream().mapToInt(c -> c)
+                        .min().orElseThrow();
 
                 System.out.println(minFuel);
 
